@@ -42,14 +42,14 @@ Color raytrace(Ray ray)
 {
 	IntersectionData data;
 	Node* closestNode = NULL;
-	
+
 	if (ray.depth > scene.settings.maxTraceDepth) return Color(0, 0, 0);
 
 	if (ray.flags & RF_DEBUG)
 		cout << "  Raytrace[start = " << ray.start << ", dir = " << ray.dir << "]\n";
 
 	data.dist = 1e99;
-	
+
 	// find closest intersection point:
 	for (int i = 0; i < (int) scene.nodes.size(); i++)
 		if (scene.nodes[i]->intersect(ray, data))
@@ -71,18 +71,18 @@ Color raytrace(Ray ray)
 		if (scene.environment != NULL) return scene.environment->getEnvironment(ray.dir);
 		return Color(0, 0, 0);
 	}
-	
+
 	if (ray.flags & RF_DEBUG) {
 		cout << "    Hit " << closestNode->geom->getName() << " at distance " << fixed << setprecision(2) << data.dist << endl;
 		cout << "      Intersection point: " << data.p << endl;
 		cout << "      Normal:             " << data.normal << endl;
 		cout << "      UV coods:           " << data.u << ", " << data.v << endl;
 	}
-	
+
 	// if the node we hit has a bump map, apply it here:
 	if (closestNode->bump)
 		closestNode->bump->modifyNormal(data);
-	
+
 	// use the shader of the closest node to shade the intersection:
 	return closestNode->shader->shade(ray, data);
 }
@@ -91,11 +91,11 @@ Color pathtrace(const Ray& ray, const Color& pathMultiplier, Random& rgen)
 {
 	IntersectionData data;
 	Node* closestNode = NULL;
-	
+
 	if (ray.depth > scene.settings.maxTraceDepth) return Color(0, 0, 0);
 
 	data.dist = 1e99;
-	
+
 	// find closest intersection point:
 	for (int i = 0; i < (int) scene.nodes.size(); i++)
 		if (scene.nodes[i]->intersect(ray, data))
@@ -129,9 +129,9 @@ Color pathtrace(const Ray& ray, const Color& pathMultiplier, Random& rgen)
 			return scene.environment->getEnvironment(ray.dir) * pathMultiplier;
 		return Color(0, 0, 0);
 	}
-	
+
 	Color resultDirect(0, 0, 0);
-	
+
 	// We continue building the path in two ways:
 	// 1) (a.k.a. "direct illumination"): connect the current path end to a random light.
 	//    This approximates the direct lighting towards the intersection point.
@@ -158,24 +158,24 @@ Color pathtrace(const Ray& ray, const Color& pathMultiplier, Random& rgen)
 			// calculate the light contribution in a manner, consistent with classic path tracing:
 			float solidAngle = light->solidAngle(w_out.start); // solid angle of the light, as seen from x.
 			// evaluate the BRDF:
-			Color brdfAtPoint = closestNode->shader->eval(data, ray, w_out); 
-			
+			Color brdfAtPoint = closestNode->shader->eval(data, ray, w_out);
+
 			lightColor = light->getColor() * solidAngle / (2*PI);
-			
+
 			// the probability to choose a particular light among all lights: 1/N
 			float pdfChooseLight = 1.0f / (float) scene.lights.size();
 			// the probability to shoot a ray in a random direction: 1/2*pi
 			float pdfInLight = 1 / (2*PI);
 			// the probability to shoot a ray for the BRDF: 1/pi
 			float pdfBRDF = 1 / PI;
-			
+
 			// combined probability for that ray:
 			float pdf = pdfChooseLight * pdfInLight * pdfBRDF;
-			
+
 			if (brdfAtPoint.intensity() > 0)
 				// Kajia's rendering equation, evaluated at a single incoming/outgoing directions pair:
 				                /* Li */    /*BRDFs@path*/    /*BRDF*/   /*ray probability*/
-				resultDirect = lightColor * pathMultiplier * brdfAtPoint / pdf; 
+				resultDirect = lightColor * pathMultiplier * brdfAtPoint / pdf;
 		}
 	}
 
@@ -186,12 +186,12 @@ Color pathtrace(const Ray& ray, const Color& pathMultiplier, Random& rgen)
 	float pdf; // the probability to choose that specific newRay
 	// sample the BRDF:
 	closestNode->shader->spawnRay(data, ray, w_out, brdfEval, pdf);
-	
+
 	if (pdf < 0) return Color(1, 0, 0);  // bogus BRDF; mark in red
 	if (pdf == 0) return Color(0, 0, 0);  // terminate the path, as required
 	Color resultGi;
 	resultGi = pathtrace(w_out, pathMultiplier * brdfEval / pdf, rgen); // continue the path normally; accumulate the new term to the BRDF product
-	
+
 	return resultDirect + resultGi;
 }
 
@@ -205,16 +205,16 @@ bool testVisibility(const Vector& from, const Vector& to)
 	ray.dir = to - from;
 	ray.dir.normalize();
 	ray.flags |= RF_SHADOW;
-	
+
 	IntersectionData temp;
 	temp.dist = (to - from).length();
-	
+
 	// if there's any obstacle between from and to, the points aren't visible.
 	// we can stop at the first such object, since we don't care about the distance.
 	for (int i = 0; i < (int) scene.nodes.size(); i++)
 		if (scene.nodes[i]->intersect(ray, temp))
 			return false;
-	
+
 	return true;
 }
 
@@ -230,7 +230,7 @@ inline bool tooDifferent(const Color& a, const Color& b)
 
 		// compare a single channel of the two colors. If the difference between them is large,
 		// but they aren't overexposed, the difference will be visible: needs anti-aliasing.
-		if (theMax - theMin > THRESHOLD && theMin < 1.33f) 
+		if (theMax - theMin > THRESHOLD && theMin < 1.33f)
 			return true;
 	}
 	return false;
@@ -278,7 +278,7 @@ Color renderSample(double x, double y, int dx = 1, int dy = 1)
 		if (scene.camera->stereoSeparation == 0)
 			return raytrace(scene.camera->getScreenRay(x, y));
 		else
-			// trace one ray through the left camera and one ray through the right, then combine the results	
+			// trace one ray through the left camera and one ray through the right, then combine the results
 			return combineStereo(
 				raytrace(scene.camera->getScreenRay(x, y, CAMERA_LEFT)),
 				raytrace(scene.camera->getScreenRay(x, y, CAMERA_RIGHT))
@@ -323,7 +323,7 @@ public:
 	TaskNoAA(const vector<Rect>& buckets): buckets(buckets), counter(0)
 	{
 	}
-	
+
 	void entry(int thread_index, int thread_count)
 	{
 		// first pass: shoot just one ray per pixel
@@ -336,7 +336,7 @@ public:
 			if (!displayVFBRect(r, vfb))
 				return;
 		}
-		
+
 	}
 };
 
@@ -368,7 +368,7 @@ void renderScene(void)
 {
 	int W = frameWidth();
 	int H = frameHeight();
-	
+
 	std::vector<Rect> buckets = getBucketsList();
 	if (scene.settings.wantPrepass || scene.settings.gi) {
 		// We render the whole screen in three passes.
@@ -396,19 +396,19 @@ void renderScene(void)
 			for (int x = 0; x < W; x++) {
 				Color neighs[5];
 				neighs[0] = vfb[y][x];
-				
+
 				neighs[1] = vfb[y][x     > 0 ? x - 1 : x];
 				neighs[2] = vfb[y][x + 1 < W ? x + 1 : x];
 
 				neighs[3] = vfb[y     > 0 ? y - 1 : y][x];
 				neighs[4] = vfb[y + 1 < H ? y + 1 : y][x];
-				
+
 				Color average(0, 0, 0);
-				
+
 				for (int i = 0; i < 5; i++)
 					average += neighs[i];
 				average /= 5.0f;
-				
+
 				for (int i = 0; i < 5; i++) {
 					if (tooDifferent(neighs[i], average)) {
 						needsAA[y][x] = true;
@@ -420,14 +420,14 @@ void renderScene(void)
 	}
 
 	bool previewAA = false; // change to true to make it just display which pixels are selected for anti-aliasing
-	
+
 	if (previewAA) {
 		for (int y = 0; y < H; y++)
 			for (int x = 0; x < W; x++)
 				if (needsAA[y][x])
 					vfb[y][x] = Color(1, 0, 0);
 	} else {
-		/* 
+		/*
 		 * A third pass, shooting additional rays for pixels that need them.
 		 * Note that all pixels already are sampled with a ray at offset (0, 0),
 		 * which coincides with sample #0 of our antialiasing kernel. So, instead
@@ -515,6 +515,7 @@ int main(int argc, char** argv)
 		printf("Could not parse the scene!\n");
 		return -1;
 	}
+
 	if (scene.settings.numThreads == 0)
 		scene.settings.numThreads = get_processor_count();
 	if (scene.settings.interactive) {

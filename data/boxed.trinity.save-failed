@@ -109,7 +109,7 @@ Phong diceShader {
 
 
 ///////////////////////// NODES /////////////////////////////////////////////////
-/*
+
 Node floor {
 	geometry  wall
 	shader    floorShader
@@ -121,14 +121,11 @@ Node ceiling {
 	rotate          (0, 0, 180)
 	translate	(0, 60, 0)
 }
-*/
+
 Node surfaceNode {
     geometry    surface
-    shader      floorShader
+    shader      red
 }
-
-
-
 /*
 Node wall_PositiveX {
 	geometry	wall

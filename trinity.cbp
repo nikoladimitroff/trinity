@@ -13,6 +13,7 @@
 				<Option compiler="gcc" />
 				<Compiler>
 					<Add option="-g" />
+					<Add directory="include" />
 				</Compiler>
 			</Target>
 			<Target title="Release">
@@ -23,6 +24,7 @@
 				<Compiler>
 					<Add option="-O3" />
 					<Add option="-ffast-math" />
+					<Add directory="include" />
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
@@ -54,6 +56,8 @@
 			<Add directory="L:/SDL-1.2.15/lib" />
 			<Add directory="L:/OpenEXR-mingw/lib" />
 		</Linker>
+		<Unit filename="src/ImplicitSurface.cpp" />
+		<Unit filename="src/ImplicitSurface.h" />
 		<Unit filename="src/bbox.h" />
 		<Unit filename="src/bitmap.cpp" />
 		<Unit filename="src/bitmap.h" />
