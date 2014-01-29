@@ -6,7 +6,7 @@
 
 static double defaultPlane(const Vector& point)
 {
-    return point.x * point.x + point.y * point.y + point.z * point.z - 100;
+    return point.x * point.x + point.y * point.y + point.z * point.z - 100;;
 }
 
 static Vector defaultGetNormal(const Vector& point)
@@ -20,12 +20,12 @@ class ImplicitSurface : public Geometry
 {
     private:
         double (* const implicitFunction) (const Vector&);
-        Vector (* const getNormal) (const Vector&);
+        Vector (* const computeGradient) (const Vector&);
     public:
         ImplicitSurface(
                         double (* const fp) (const Vector&) = &defaultPlane,
                         Vector (* const normalFunctionPointer) (const Vector&) = &defaultGetNormal
-                        ): implicitFunction(fp), getNormal(normalFunctionPointer) { }
+                        ): implicitFunction(fp), computeGradient(normalFunctionPointer) { }
 
         void fillProperties(ParsedBlock& pb)
         {

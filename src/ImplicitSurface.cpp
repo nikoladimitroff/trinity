@@ -7,11 +7,11 @@ bool ImplicitSurface::intersect(Ray ray, IntersectionData& data)
 {
     Vector currentPos = ray.start;
     double currentDistance = this->implicitFunction(ray.start);
-    double step = 0.05;
+    double step = 10;
 
     double tempDistance = this->implicitFunction(ray.start + ray.dir * 1e-3);
 
-    while (abs(currentDistance) > 1e-8)
+    while (abs(currentDistance) > 1e-6)
     {
         currentDistance = tempDistance;
         currentPos += step * ray.dir;
@@ -29,43 +29,34 @@ bool ImplicitSurface::intersect(Ray ray, IntersectionData& data)
     }
 
     // Do binary search
-//
-//    if (fabs(currentDistance) > 1e-3)
-//     {
-//        currentPos += -step * ray.dir;
-//        Vector savedPosition = currentPos;
-//        double maxDistance = max(currentDistance, tempDistance);
-//        double minDistance = min(currentDistance, tempDistance);
-//        double lambda = 0.5;
-//        while (fabs(currentDistance) > 1e-3)
-//        {
-//            double newStep = step * lambda;
-//            double midDistance = minDistance + fabs(maxDistance - minDistance) / 2;
-//            currentPos = savedPosition + newStep * ray.dir;
-//            tempDistance = this->implicitFunction(currentPos);
-//            if (tempDistance > 0)
-//            {
-//                maxDistance = midDistance;
-//                lambda -= lambda / 2;
-//            }
-//            else if (tempDistance < 0)
-//            {
-//                minDistance = midDistance;
-//                lambda += lambda / 2;
-//            }
-//            currentDistance = tempDistance;
-//        }
-//     }
+
+    double maxStep = step;
+    double minStep = 0;
+    double leftSign = fabs(currentDistance) / currentDistance;
+    Vector savedPos = currentPos - step * ray.dir;
+    while (fabs(currentDistance) >= 1)
+    {
+        double mid = minStep + (maxStep - minStep) / 2;
+        currentPos = savedPos + mid * ray.dir;
+        currentDistance = this->implicitFunction(currentPos);
+        if (currentDistance * leftSign > 0)
+        {
+            minStep = mid;
+        }
+        else if (currentDistance * leftSign < 0)
+        {
+            maxStep = mid;
+        }
+    }
 
     double distance = (currentPos - ray.start).length();
     if (distance > data.dist)
     {
         return false;
     }
-    cout << currentPos.x << " " << currentPos.y << " " << currentPos.z << endl;
     data.p = currentPos;
     data.dist = distance;
-    data.normal = this->getNormal(currentPos);
+    data.normal = this->computeGradient(currentPos);
     data.dNdx = Vector(data.normal.x, 0, 0);
     data.dNdy = Vector(0, 0, data.normal.z);
     data.u = data.p.x;
