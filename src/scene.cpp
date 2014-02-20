@@ -354,6 +354,7 @@ SceneParser& ParsedBlockImpl::getParser()
 	return *parser;
 }
 
+
 class DefaultSceneParser: public SceneParser {
 	char sceneRootDir[256];
 	Scene* s;
