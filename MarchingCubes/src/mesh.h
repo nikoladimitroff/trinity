@@ -96,6 +96,7 @@ public:
 
 	void setFaceted(bool faceted) { this->faceted = faceted; }
     void initMesh(void);
+    void initMeshFromCubes(void);
 	void fillData(const std::vector<Vector>& vertices, const std::vector<Vector>& normals, const std::vector<Triangle>& triangles);
 	void fillProperties(ParsedBlock& pb)
 	{
@@ -103,6 +104,13 @@ public:
 		if (pb.getFilenameProp("file", fileName))
         {
 			loadFromOBJ(fileName);
+        }
+		else
+        {
+            std::cout<<"myMesh"<<std::endl;
+//            pb.requiredProp("file");
+            initMeshFromCubes();
+            return;
         }
 		pb.getBoolProp("faceted", &faceted);
 		pb.getBoolProp("backfaceCulling", &backfaceCulling);

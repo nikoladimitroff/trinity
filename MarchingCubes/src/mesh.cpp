@@ -35,6 +35,31 @@ using std::string;
 using std::vector;
 using std::swap;
 
+void Mesh::initMeshFromCubes(void)
+{
+    MarchingCubes cubes;
+    Mesh* mesh = cubes.cubesIntersect();
+
+    fillData(mesh->vertices, mesh->normals, mesh->triangles);
+    // calculate a bounding box around the mesh:
+	boundingBox.makeEmpty();
+	for (int i = 1; i < (int) vertices.size(); i++)
+		boundingBox.add(vertices[i]);
+	kdroot = NULL;
+	this->useKDTree = true;
+	if (triangles.size() > 40 && useKDTree) {
+		kdroot = new KDTreeNode;
+		Uint32 ticks = SDL_GetTicks();
+		vector<int> allTriangles;
+		for (int i = 0; i < (int) triangles.size(); i++)
+			allTriangles.push_back(i);
+		build(*kdroot, boundingBox, allTriangles, 0);
+		Uint32 timeElapsed = SDL_GetTicks() - ticks;
+		printf("KDtree built: %d triangles in %d ms\n",
+			(int) allTriangles.size(), timeElapsed);
+	}
+}
+
 void Mesh::initMesh(void)
 {
     // calculate a bounding box around the mesh:
@@ -482,23 +507,4 @@ void Mesh::fillData(const std::vector<Vector>& vertices, const std::vector<Vecto
     }
 
     computeNormals();
-
-
-    // calculate a bounding box around the mesh:
-	boundingBox.makeEmpty();
-	for (int i = 1; i < (int) vertices.size(); i++)
-		boundingBox.add(vertices[i]);
-	kdroot = NULL;
-	this->useKDTree = true;
-	if (triangles.size() > 40 && useKDTree) {
-		kdroot = new KDTreeNode;
-		Uint32 ticks = SDL_GetTicks();
-		vector<int> allTriangles;
-		for (int i = 0; i < (int) triangles.size(); i++)
-			allTriangles.push_back(i);
-		build(*kdroot, boundingBox, allTriangles, 0);
-		Uint32 timeElapsed = SDL_GetTicks() - ticks;
-		printf("KDtree built: %d triangles in %d ms\n",
-			(int) allTriangles.size(), timeElapsed);
-    }
 }

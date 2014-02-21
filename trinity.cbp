@@ -56,8 +56,12 @@
 			<Add directory="L:/SDL-1.2.15/lib" />
 			<Add directory="L:/OpenEXR-mingw/lib" />
 		</Linker>
+		<Unit filename="src/FormulaParser.cpp" />
+		<Unit filename="src/FormulaParser.h" />
 		<Unit filename="src/ImplicitSurface.cpp" />
 		<Unit filename="src/ImplicitSurface.h" />
+		<Unit filename="src/MarchingCubes.cpp" />
+		<Unit filename="src/MarchingCubes.h" />
 		<Unit filename="src/bbox.h" />
 		<Unit filename="src/bitmap.cpp" />
 		<Unit filename="src/bitmap.h" />
@@ -75,6 +79,7 @@
 		<Unit filename="src/heightfield.h" />
 		<Unit filename="src/lights.cpp" />
 		<Unit filename="src/lights.h" />
+		<Unit filename="src/lookUpTables.h" />
 		<Unit filename="src/main.cpp" />
 		<Unit filename="src/matrix.cpp" />
 		<Unit filename="src/matrix.h" />

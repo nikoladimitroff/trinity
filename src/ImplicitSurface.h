@@ -1,40 +1,68 @@
 #ifndef IMPLICITSURFACE_H
 #define IMPLICITSURFACE_H
 
+#include <queue>
+#include <string>
+#include <iostream>
+
+
 #include "geometry.h"
-
-
-static double defaultPlane(const Vector& point)
-{
-    return point.x * point.x + point.y * point.y + point.z * point.z - 100;;
-}
-
-static Vector defaultGetNormal(const Vector& point)
-{
-    Vector gradient(2 * point.x, 2 * point.y, 2 * point.z);
-    gradient.normalize();
-    return gradient;
-}
+#include "FormulaParser.h"
+#include "Mesh.h"
+#include "MarchingCubes.h"
 
 class ImplicitSurface : public Geometry
 {
     private:
-        double (* const implicitFunction) (const Vector&);
-        Vector (* const computeGradient) (const Vector&);
+        bool goFast;
+        std::queue<std::string> formulaExpression;
+        Mesh* mesh;
     public:
-        ImplicitSurface(
-                        double (* const fp) (const Vector&) = &defaultPlane,
-                        Vector (* const normalFunctionPointer) (const Vector&) = &defaultGetNormal
-                        ): implicitFunction(fp), computeGradient(normalFunctionPointer) { }
+        ImplicitSurface(): mesh(nullptr) { }
 
-        void fillProperties(ParsedBlock& pb)
+        ~ImplicitSurface()
         {
+            if (this->mesh != nullptr)
+                delete this->mesh;
+        }
 
+        /** Copy Constructor */
+        ImplicitSurface(const ImplicitSurface& other):
+            formulaExpression(other.formulaExpression)
+        {
+            MarchingCubes cubes(this->formulaExpression);
+            this->mesh = cubes.cubesIntersect();
+        }
+
+        /** Copy Assignment Operator */
+        ImplicitSurface& operator= (ImplicitSurface other)
+        {
+            this->formulaExpression = other.formulaExpression;
+
+            MarchingCubes cubes(this->formulaExpression);
+            this->mesh = cubes.cubesIntersect();
+
+            return *this;
+        }
+
+        void fillProperties(ParsedBlock& pb);
+        double implicitFunction(const Vector& point) const
+        {
+            if (this->goFast)
+                return point.x * point.x + point.y * point.y + point.z * point.z - 100;
+
+            return FormulaParser::RPNParse(point.x, point.y, point.z, this->formulaExpression);
         }
 
         bool intersect(Ray ray, IntersectionData& data);
         const char* getName() { return "ImplicitSurface"; }
-        bool isInside(const Vector& p) const { return this->implicitFunction(p) < 0; }
+        bool isInside(const Vector& p) const
+        {
+            if (this->mesh != nullptr)
+                return this->mesh->isInside(p);
+
+            return this->implicitFunction(p) < 0;
+        }
 };
 
 #endif // IMPLICITSURFACE_H

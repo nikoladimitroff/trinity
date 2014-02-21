@@ -19,6 +19,7 @@
  ***************************************************************************/
 
 #include <SDL/SDL.h>
+#include <SDL/SDL_net.h>
 #include <vector>
 #include <iostream>
 #include "sdl.h"
@@ -32,6 +33,7 @@
 #include "scene.h"
 #include "lights.h"
 #include "cxxptl_sdl.h"
+#include "parser.h"
 using namespace std;
 
 Color vfb[VFB_MAX_SIZE][VFB_MAX_SIZE]; //!< virtual framebuffer
@@ -40,8 +42,6 @@ bool testVisibility(const Vector& from, const Vector& to);
 /// traces a ray in the scene and returns the visible light that comes from that direction
 Color raytrace(Ray ray)
 {
-
-
 	IntersectionData data;
 	Node* closestNode = NULL;
 
@@ -338,6 +338,7 @@ public:
 			if (!displayVFBRect(r, vfb))
 				return;
 		}
+
 	}
 };
 

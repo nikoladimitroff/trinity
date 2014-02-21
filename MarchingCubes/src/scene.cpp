@@ -44,6 +44,7 @@
 #include "lights.h"
 #include <assert.h>
 
+#include "MarchingCubes.h"
 #include "ImplicitSurface.h"
 
 using std::vector;
@@ -353,7 +354,6 @@ SceneParser& ParsedBlockImpl::getParser()
 {
 	return *parser;
 }
-
 
 class DefaultSceneParser: public SceneParser {
 	char sceneRootDir[256];
@@ -791,6 +791,46 @@ bool Scene::parseScene(const char* filename)
 {
 	DefaultSceneParser parser;
 	return parser.parse(filename, this);
+
+//    Camera* camera = new Camera();
+//    camera->aspect = 1.333;
+//    camera->fov= 90;
+//    camera->pos = Vector(-30, 22, -140);
+//    camera->pitch = -22.9;
+//    camera->roll = 0.0;
+//    camera->yaw = -34.4;
+//
+//    this->camera = camera;
+//
+//    RectLight* light = new RectLight();
+//    light->xSubd = 4;
+//    light->ySubd = 4;
+//    light->transform.scale(20,20,20);
+//    light->transform.rotate(0, -62, 0);
+//    light->transform.translate(Vector(0,28,50));
+//    light->color = Color(1,1,1);
+//    light->power = 100;
+//
+//    this->lights.push_back(light);
+//
+//    MarchingCubes cubes;
+//
+//    Mesh* mesh = cubes.cubesIntersect();
+//    mesh->initMesh();
+//
+//    this->geometries.push_back(mesh);
+//
+//    Shader* shader = new Phong();
+//
+//    this->shaders.push_back(shader);
+//
+//    Node* node = new Node();
+//    node->shader=shader;
+//    node->geom = mesh;
+//
+//    this->nodes.push_back(node);
+//
+//    return true;
 }
 
 void Scene::beginRender()

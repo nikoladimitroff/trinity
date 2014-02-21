@@ -1,0 +1,9 @@
+# depslib dependency file v1.0
+1392935759 source:c:\users\p\desktop\ebise\shunnfinal\main.cpp
+	<iostream>
+	<string>
+	<stack>
+	<queue>
+	<stdlib.h>
+	<math.h>
+
