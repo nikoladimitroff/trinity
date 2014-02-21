@@ -134,9 +134,7 @@ Mesh* MarchingCubes::convertTriangles(mTriangle* triangles, int length)
         vertices.push_back(triangles[i].p[0]);
         vertices.push_back(triangles[i].p[1]);
         vertices.push_back(triangles[i].p[2]);
-
-        uvs.push_back(triangles[i].p[0]);
-
+		
         normals.push_back(triangles[i].norm);
 
         Triangle temp;
