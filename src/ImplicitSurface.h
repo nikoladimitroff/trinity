@@ -1,35 +1,25 @@
 #ifndef IMPLICITSURFACE_H
 #define IMPLICITSURFACE_H
 
+#include <queue>
+#include <string>
+#include <iostream>
+
+
 #include "geometry.h"
-
-
-static double defaultPlane(const Vector& point)
-{
-    return point.x * point.x + point.y * point.y + point.z * point.z - 100;;
-}
-
-static Vector defaultGetNormal(const Vector& point)
-{
-    Vector gradient(2 * point.x, 2 * point.y, 2 * point.z);
-    gradient.normalize();
-    return gradient;
-}
+#include "FormulaParser.h"
 
 class ImplicitSurface : public Geometry
 {
     private:
-        double (* const implicitFunction) (const Vector&);
-        Vector (* const computeGradient) (const Vector&);
+        std::queue<std::string> formulaExpression;
     public:
-        ImplicitSurface(
-                        double (* const fp) (const Vector&) = &defaultPlane,
-                        Vector (* const normalFunctionPointer) (const Vector&) = &defaultGetNormal
-                        ): implicitFunction(fp), computeGradient(normalFunctionPointer) { }
+        ImplicitSurface() { }
 
-        void fillProperties(ParsedBlock& pb)
+        void fillProperties(ParsedBlock& pb);
+        double implicitFunction(const Vector& point) const
         {
-
+           return FormulaParser::RPNParse(point.x, point.y, point.z, this->formulaExpression);
         }
 
         bool intersect(Ray ray, IntersectionData& data);

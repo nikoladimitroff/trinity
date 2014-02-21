@@ -40,6 +40,8 @@ bool testVisibility(const Vector& from, const Vector& to);
 /// traces a ray in the scene and returns the visible light that comes from that direction
 Color raytrace(Ray ray)
 {
+
+
 	IntersectionData data;
 	Node* closestNode = NULL;
 
@@ -336,7 +338,6 @@ public:
 			if (!displayVFBRect(r, vfb))
 				return;
 		}
-
 	}
 };
 

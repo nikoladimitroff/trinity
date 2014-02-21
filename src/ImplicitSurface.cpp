@@ -1,7 +1,19 @@
 #include "ImplicitSurface.h"
+#include "FormulaParser.h"
 #include <iostream>
+#include <sstream>
+#include <string.h>
 
 using namespace std;
+
+void ImplicitSurface::fillProperties(ParsedBlock& block)
+{
+    char formulaText[100];
+    block.getStringProp("formula", formulaText);
+    string formula = formulaText;
+
+    this->formulaExpression = FormulaParser::GenerateTree(formulaText);
+}
 
 bool ImplicitSurface::intersect(Ray ray, IntersectionData& data)
 {
@@ -54,9 +66,18 @@ bool ImplicitSurface::intersect(Ray ray, IntersectionData& data)
     {
         return false;
     }
+
+    double epsilon = 1e-6;
+    double value = this->implicitFunction(currentPos);
+    Vector epsilonVector(
+                         this->implicitFunction(currentPos + Vector(epsilon, 0, 0)) - value,
+                         this->implicitFunction(currentPos + Vector(0, epsilon, 0)) - value,
+                         this->implicitFunction(currentPos + Vector(0, 0, epsilon)) - value);
+    epsilonVector.normalize();
+    //cout << epsilonVector.x << " " << epsilonVector.y << " " << epsilonVector.z << endl;
     data.p = currentPos;
     data.dist = distance;
-    data.normal = this->computeGradient(currentPos);
+    data.normal = epsilonVector;
     data.dNdx = Vector(data.normal.x, 0, 0);
     data.dNdy = Vector(0, 0, data.normal.z);
     data.u = data.p.x;

@@ -156,7 +156,6 @@ public:
 	virtual bool getTextureProp(const char* name, Texture** value) = 0;
 	virtual bool getNodeProp(const char* name, Node** value) = 0;
 	virtual bool getStringProp(const char* name, char* value) = 0; // the buffer should be 256 chars long
-	virtual bool getSurfaceProp(const char* name) = 0;
 
 	// useful for scene assets like textures, mesh files, etc.
 	// the value will hold the full filename to the file.

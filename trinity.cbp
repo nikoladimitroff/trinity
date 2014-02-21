@@ -53,6 +53,7 @@
 			<Add library="Half" />
 			<Add library="IlmThread" />
 			<Add library="zlibstatic" />
+			<Add library="L:\SDL-1.2.15\bin\SDL_net.dll" />
 			<Add directory="L:/SDL-1.2.15/lib" />
 			<Add directory="L:/OpenEXR-mingw/lib" />
 		</Linker>
