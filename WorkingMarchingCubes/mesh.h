@@ -96,7 +96,7 @@ public:
 
 	void setFaceted(bool faceted) { this->faceted = faceted; }
     void initMesh(void);
-	void fillData(const std::vector<Vector>& vertices, const std::vector<Vector>& normals, const std::vector<Triangle>& triangles, const std::vector<Vector> uvs);
+	void fillData(const std::vector<Vector>& vertices, const std::vector<Vector>& normals, const std::vector<Triangle>& triangles);
 	void fillProperties(ParsedBlock& pb)
 	{
 		char fileName[256];
