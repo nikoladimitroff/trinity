@@ -1,8 +1,6 @@
 #include "ImplicitSurface.h"
 #include "FormulaParser.h"
 #include <iostream>
-#include <sstream>
-#include <string.h>
 
 using namespace std;
 
@@ -13,13 +11,26 @@ void ImplicitSurface::fillProperties(ParsedBlock& block)
     string formula = formulaText;
 
     this->formulaExpression = FormulaParser::GenerateTree(formulaText);
+
+    bool shouldTriangulate;
+    if (block.getBoolProp("triangulate", &shouldTriangulate) && shouldTriangulate)
+    {
+        MarchingCubes cubes(this->formulaExpression);
+        this->mesh = cubes.cubesIntersect();
+    }
+
+    this->goFast = block.getBoolProp("gofast", &this->goFast) && goFast;
 }
 
 bool ImplicitSurface::intersect(Ray ray, IntersectionData& data)
 {
+    if (this->mesh != nullptr)
+        return this->mesh->intersect(ray, data);
+
+
     Vector currentPos = ray.start;
     double currentDistance = this->implicitFunction(ray.start);
-    double step = 10;
+    double step = 1;
 
     double tempDistance = this->implicitFunction(ray.start + ray.dir * 1e-3);
 
@@ -46,7 +57,7 @@ bool ImplicitSurface::intersect(Ray ray, IntersectionData& data)
     double minStep = 0;
     double leftSign = fabs(currentDistance) / currentDistance;
     Vector savedPos = currentPos - step * ray.dir;
-    while (fabs(currentDistance) >= 1)
+    while (fabs(currentDistance) >= 1e-6)
     {
         double mid = minStep + (maxStep - minStep) / 2;
         currentPos = savedPos + mid * ray.dir;

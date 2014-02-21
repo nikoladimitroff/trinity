@@ -8,23 +8,61 @@
 
 #include "geometry.h"
 #include "FormulaParser.h"
+#include "Mesh.h"
+#include "MarchingCubes.h"
 
 class ImplicitSurface : public Geometry
 {
     private:
+        bool goFast;
         std::queue<std::string> formulaExpression;
+        Mesh* mesh;
     public:
-        ImplicitSurface() { }
+        ImplicitSurface(): mesh(nullptr) { }
+
+        ~ImplicitSurface()
+        {
+            if (this->mesh != nullptr)
+                delete this->mesh;
+        }
+
+        /** Copy Constructor */
+        ImplicitSurface(const ImplicitSurface& other):
+            formulaExpression(other.formulaExpression)
+        {
+            MarchingCubes cubes(this->formulaExpression);
+            this->mesh = cubes.cubesIntersect();
+        }
+
+        /** Copy Assignment Operator */
+        ImplicitSurface& operator= (ImplicitSurface other)
+        {
+            this->formulaExpression = other.formulaExpression;
+
+            MarchingCubes cubes(this->formulaExpression);
+            this->mesh = cubes.cubesIntersect();
+
+            return *this;
+        }
 
         void fillProperties(ParsedBlock& pb);
         double implicitFunction(const Vector& point) const
         {
-           return FormulaParser::RPNParse(point.x, point.y, point.z, this->formulaExpression);
+            if (this->goFast)
+                return point.x * point.x + point.y * point.y + point.z * point.z - 100;
+
+            return FormulaParser::RPNParse(point.x, point.y, point.z, this->formulaExpression);
         }
 
         bool intersect(Ray ray, IntersectionData& data);
         const char* getName() { return "ImplicitSurface"; }
-        bool isInside(const Vector& p) const { return this->implicitFunction(p) < 0; }
+        bool isInside(const Vector& p) const
+        {
+            if (this->mesh != nullptr)
+                return this->mesh->isInside(p);
+
+            return this->implicitFunction(p) < 0;
+        }
 };
 
 #endif // IMPLICITSURFACE_H

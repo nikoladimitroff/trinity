@@ -47,6 +47,8 @@ Plane wall {
 
 ImplicitSurface surface {
     formula x * x + y * y + z * z - 100
+    triangulate false
+    gofast true
 }
 
 Mesh teapot {
@@ -124,7 +126,7 @@ Node ceiling {
 
 Node surfaceNode {
     geometry    surface
-    shader      floorShader
+    shader      red
 }
 
 
