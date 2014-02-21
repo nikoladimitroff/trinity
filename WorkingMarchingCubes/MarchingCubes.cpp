@@ -128,7 +128,6 @@ Mesh* MarchingCubes::convertTriangles(mTriangle* triangles, int length)
     vector<Vector> vertices;
     vector<Vector> normals;
     vector<Triangle> tTriangles;
-    vector<Vector> uvs;
 
     for(int i=0; i < length; i++)
     {
@@ -155,7 +154,7 @@ Mesh* MarchingCubes::convertTriangles(mTriangle* triangles, int length)
     }
 //    std::cout<<tTriangles.size()<<endl;
 
-    mesh->fillData(vertices, normals, tTriangles, uvs);
+    mesh->fillData(vertices, normals, tTriangles);
 
     return mesh;
 }
