@@ -56,10 +56,10 @@ Plane wall {
 }
 
 ImplicitSurface surface {
-    formula x * x + y * y + z * z  - 100
+    formula x * x + 10 * y * y + z * z  - 100
     triangulate false
     triangulationQuality 100
-    gofast true
+    gofast false
 }
 
 Mesh teapot {

@@ -24,7 +24,7 @@ struct mTriangle {
 class MarchingCubes
 {
 private:
-    std::queue<std::string> expression;
+    TreeNode* expression;
     Mesh* convertTriangles(mTriangle* triangles, int length);
 
     Mesh* createTriangles(int nCellsX, int nCellsY, int nCellsZ, float minValue, Vector* points, float* values);
@@ -34,7 +34,7 @@ private:
 
 public:
     MarchingCubes(
-    std::queue<std::string> expression
+    TreeNode* expression
     ): expression(expression) { }
 
     Mesh* generateMesh(int cellsCount = 60)

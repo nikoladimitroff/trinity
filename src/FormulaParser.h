@@ -2,11 +2,14 @@
 #define FORMULA_PARSER_GUARD
 
 #include <string>
-#include <queue>
+#include <vector>
+
+class TreeNode;
+
 namespace FormulaParser
 {
-    std::queue<std::string> GenerateTree(std::string input);
-    double RPNParse(double x, double y, double z, std::queue<std::string> surfaceEquation);
+    TreeNode* GenerateTree(std::string input);
+    double RPNParse(double x, double y, double z, TreeNode* surfaceEquation);
 }
 
 #endif // FORMULA_PARSER_GUARD

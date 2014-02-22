@@ -5,7 +5,6 @@
 #include <string>
 #include <iostream>
 
-
 #include "geometry.h"
 #include "FormulaParser.h"
 #include "Mesh.h"
@@ -15,7 +14,7 @@ class ImplicitSurface : public Geometry
 {
     private:
         bool goFast;
-        std::queue<std::string> formulaExpression;
+        TreeNode* formulaExpression;
         int meshQuality;
         Mesh* mesh;
     public:

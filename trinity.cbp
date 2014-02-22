@@ -62,6 +62,7 @@
 		<Unit filename="src/ImplicitSurface.h" />
 		<Unit filename="src/MarchingCubes.cpp" />
 		<Unit filename="src/MarchingCubes.h" />
+		<Unit filename="src/TreeNode.h" />
 		<Unit filename="src/bbox.h" />
 		<Unit filename="src/bitmap.cpp" />
 		<Unit filename="src/bitmap.h" />

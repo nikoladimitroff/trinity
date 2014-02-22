@@ -1,19 +1,25 @@
 #include <iostream>
+#include <mutex>
 #include <string>
 #include <stack>
 #include <queue>
 #include <stdlib.h>
 #include <math.h>
-
 #include "FormulaParser.h"
+#include "TreeNode.h"
 using namespace std;
 
-static void AddToQueue(queue<string>& q, string el)
+static bool RequiresTwoArguments(const string& token)
 {
-	if(el != "")
-		q.push(el);
+	return token=="+"||
+		token=="-" ||
+		token=="*" ||
+		token=="/" ||
+		token=="%" ||
+		token=="^" ||
+		token=="max"||
+		token=="min";
 }
-
 
 static bool IsOperator(const string& token) {
 	return token == "+" ||
@@ -36,7 +42,75 @@ static bool IsFunction(const string& token){
             token=="floor" ||
             token=="ceil" ||
             token=="sqrt";
-	;
+}
+
+double FormulaParser::RPNParse(double x, double y, double z, TreeNode* root)
+{
+	if(root->HasValue())
+	{
+		if(root->Parameter == "x")
+			return x;
+		else if(root->Parameter == "y")
+			return y;
+		else if(root->Parameter == "z")
+			return z;
+		else
+			return root->Value;
+	}
+
+	double left, right;
+	bool hasRight = root->Right != nullptr;
+	bool hasLeft = root->Left != nullptr;
+
+	if(hasLeft)
+		left = RPNParse(x, y, z, root->Left);
+
+	if(hasRight)
+		right = RPNParse(x, y, z, root->Right);
+
+	switch (root->Op)
+	{
+	case TreeOperator::Plus:
+		return left + right;
+	case TreeOperator::Minus:
+		return left - right;
+    case TreeOperator::Divide:
+        return left / right;
+    case TreeOperator::Mult:
+        return left * right;
+    case TreeOperator::Pow:
+        return pow(left,right);
+    case TreeOperator::Mod:
+        return (int)left % (int)right;
+    case TreeOperator::Max:
+        return max(left,right);
+    case TreeOperator::Min:
+        return min(left,right);
+    case TreeOperator::Sin:
+        return sin(right);
+    case TreeOperator::Cos:
+        return cos(right);
+    case TreeOperator::Tan:
+        return tan(right);
+    case TreeOperator::Cotan:
+        return 1/tan(right);
+    case TreeOperator::Asin:
+        return asin(right);
+    case TreeOperator::Floor:
+        return floor(right);
+    case TreeOperator::Ceil:
+        return ceil(right);
+    case TreeOperator::Sqrt:
+        return sqrt(right);
+	default:
+		throw new exception();
+	}
+}
+
+static void AddToQueue(queue<string>& q, string el)
+{
+	if(el != "")
+		q.push(el);
 }
 
 static bool IsLeftPare(const string& token)
@@ -85,7 +159,7 @@ static TokenType switchHelper(const string& token)
 	return Number;
 }
 
-static queue<string> ShuntingYard(queue<string> tokens)
+static vector<string> ShuntingYard(queue<string> tokens)
 {
 	string result="";
 	stack<string> operatorsStack;
@@ -148,23 +222,19 @@ static queue<string> ShuntingYard(queue<string> tokens)
 		if(operatorsStack.top()!="(")outputQueue.push(operatorsStack.top());
 		operatorsStack.pop();
 	}
-	return outputQueue;
+	vector<string> vec;
+
+	while(!outputQueue.empty())
+    {
+        vec.push_back(outputQueue.front());
+        outputQueue.pop();
+    }
+	return vec;
 }
 
-static bool RequiresTwoArguments(string token)
-{
-	return token=="+"||
-		token=="-" ||
-		token=="*" ||
-		token=="/" ||
-		token=="%" ||
-		token=="^" ||
-		token=="max" ||
-		token=="min";
-}
-namespace FormulaParser
-{
-    queue<string> tokenize(string input){
+
+namespace FormulaParser{
+queue<string> tokenize(string input){
         queue<string> tokens;
         int tBegin=0;
         for(unsigned int i=0;i<input.length();++i)
@@ -191,56 +261,8 @@ namespace FormulaParser
         return tokens;
     }
 }
-queue<string> FormulaParser::GenerateTree(string input)
-{
-    return ShuntingYard(tokenize(input));
-}
 
-double FormulaParser::RPNParse(double x, double y, double z, queue<string> surfaceEquation) //TODO:NIKOLA tuka malko ne moa si spomnq kak si bqhme napravili Vector v trinity
-    {
-    stack<double> values;
-    while(!surfaceEquation.empty())
-    {
-        string currentToken = surfaceEquation.front();
-        surfaceEquation.pop();
-        if(!IsOperator(currentToken)&&!IsFunction(currentToken))
-        {
-            if(currentToken=="x") values.push(x);
-            else if(currentToken=="y") values.push(y);
-            else if(currentToken=="z") values.push(z);
-            else values.push(atof(currentToken.c_str()));
-        }
-        else
-        {
-            double temp=0;
-            double argumentOne = values.top();
-            values.pop();
-            if(RequiresTwoArguments(currentToken))
-            {
-                double argumentTwo = values.top();
-                values.pop();
-                if(currentToken=="+")temp = argumentOne+argumentTwo;
-                if(currentToken=="-")temp = argumentTwo-argumentOne;
-                if(currentToken=="*")temp = argumentOne*argumentTwo;
-                if(currentToken=="/")temp = argumentTwo/argumentOne;
-                if(currentToken=="^")temp = pow(argumentTwo,argumentOne);
-                if(currentToken=="%")temp = (int)argumentOne%(int)argumentTwo;
-                if(currentToken=="max")temp = max(argumentOne,argumentTwo);
-                if(currentToken=="min")temp = min(argumentOne,argumentTwo);
-            }
-            else
-            {
-                if(currentToken=="sin")temp = sin(argumentOne);
-                if(currentToken=="cos")temp = cos(argumentOne);
-                if(currentToken=="tan") temp = tan(argumentOne);
-                if(currentToken=="cotan")temp = 1/tan(argumentOne);
-                if(currentToken=="asin")temp = asin(argumentOne);
-                if(currentToken=="floor")temp = floor(argumentOne);
-                if(currentToken=="ceil")temp = ceil(argumentOne);
-                if(currentToken=="sqrt")temp = sqrt(argumentOne);
-            }
-            values.push(temp);
-        }
-    }
-    return values.top();
+TreeNode* FormulaParser::GenerateTree(string input)
+{
+    return Treenify(ShuntingYard(FormulaParser::tokenize(input)));
 }
