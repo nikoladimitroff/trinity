@@ -16,9 +16,10 @@ class ImplicitSurface : public Geometry
     private:
         bool goFast;
         std::queue<std::string> formulaExpression;
+        int meshQuality;
         Mesh* mesh;
     public:
-        ImplicitSurface(): mesh(nullptr) { }
+        ImplicitSurface(): mesh(nullptr), meshQuality(60) { }
 
         ~ImplicitSurface()
         {
@@ -31,7 +32,7 @@ class ImplicitSurface : public Geometry
             formulaExpression(other.formulaExpression)
         {
             MarchingCubes cubes(this->formulaExpression);
-            this->mesh = cubes.cubesIntersect();
+            this->mesh = cubes.generateMesh(this->meshQuality);
         }
 
         /** Copy Assignment Operator */
@@ -40,7 +41,7 @@ class ImplicitSurface : public Geometry
             this->formulaExpression = other.formulaExpression;
 
             MarchingCubes cubes(this->formulaExpression);
-            this->mesh = cubes.cubesIntersect();
+            this->mesh = cubes.generateMesh(this->meshQuality);
 
             return *this;
         }
@@ -49,7 +50,7 @@ class ImplicitSurface : public Geometry
         double implicitFunction(const Vector& point) const
         {
             if (this->goFast)
-                return point.x * point.x + point.y * point.y + point.z * point.z - 100;
+                return point.x * point.x +  point.y * point.y + point.z * point.z - 100;
 
             return FormulaParser::RPNParse(point.x, point.y, point.z, this->formulaExpression);
         }

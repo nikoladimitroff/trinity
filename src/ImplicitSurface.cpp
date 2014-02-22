@@ -16,7 +16,9 @@ void ImplicitSurface::fillProperties(ParsedBlock& block)
     if (block.getBoolProp("triangulate", &shouldTriangulate) && shouldTriangulate)
     {
         MarchingCubes cubes(this->formulaExpression);
-        this->mesh = cubes.cubesIntersect();
+        block.getIntProp("triangulationQuality", &this->meshQuality);
+
+        this->mesh = cubes.generateMesh(this->meshQuality);
     }
 
     this->goFast = block.getBoolProp("gofast", &this->goFast) && goFast;

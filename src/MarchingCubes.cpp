@@ -26,7 +26,7 @@ Mesh* MarchingCubes::cubesIntersect(float minX, float maxX, float minY, float ma
             {
                 Vector vert(vertX, vertY, minZ + k * stepSize.z);
                 cubesDataPoints[ni + nj + k] = vert;
-                values[ni + nj + k] = FormulaParser::RPNParse(vert.x, vert.y, vert.x, this->expression);
+                values[ni + nj + k] = FormulaParser::RPNParse(vert.x, vert.y, vert.z, this->expression);
             }
         }
     }

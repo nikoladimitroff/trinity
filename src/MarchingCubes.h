@@ -27,15 +27,20 @@ private:
     std::queue<std::string> expression;
     Mesh* convertTriangles(mTriangle* triangles, int length);
 
+    Mesh* createTriangles(int nCellsX, int nCellsY, int nCellsZ, float minValue, Vector* points, float* values);
+
+    Mesh* cubesIntersect(float minX = -70, float maxX = 100, float minY = -40, float maxY = 100, float minZ = -100, float maxZ = 100,
+                        int nCellsX = 60, int nCellsY = 60, int nCellsZ = 60, float minValue = 1e-3);
+
 public:
     MarchingCubes(
     std::queue<std::string> expression
     ): expression(expression) { }
 
-    Mesh* createTriangles(int nCellsX, int nCellsY, int nCellsZ, float minValue, Vector* points, float* values);
-
-    Mesh* cubesIntersect(float minX = -70, float maxX = 100, float minY = -40, float maxY = 100, float minZ = -100, float maxZ = 100,
-                        int nCellsX = 60, int nCellsY = 60, int nCellsZ = 60, float minValue = 1e-3);
+    Mesh* generateMesh(int cellsCount = 60)
+    {
+        return this->cubesIntersect(-200, 200, -200, 200, -200, 200, cellsCount, cellsCount, cellsCount, 1e-3);
+    }
 };
 
 #endif // MARCHINGCUBES_H_INCLUDED

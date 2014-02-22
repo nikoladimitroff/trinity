@@ -483,6 +483,7 @@ void Mesh::fillData(const std::vector<Vector>& vertices, const std::vector<Vecto
 
     computeNormals();
 
+    this->backfaceCulling = false;
 
     // calculate a bounding box around the mesh:
 	boundingBox.makeEmpty();

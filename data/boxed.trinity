@@ -5,7 +5,16 @@ GlobalSettings {
 	ambientLight        (0.075, 0.075, 0.075)
 	maxTraceDepth 1
 }
-
+/*
+Camera camera {
+	pos          (40, 22, 0)
+	yaw           68.8
+	pitch        -22.9
+	roll          0.0
+	fov           90
+	aspect   1.333
+}
+*/
 Camera camera {
 	pos          (-40, 22, 0)
 	yaw           -68.8
@@ -14,6 +23,7 @@ Camera camera {
 	fov           90
 	aspect   1.333
 }
+
 
 //////////////////////// LIGHTS ////////////////////////////////////////////
 
@@ -46,8 +56,9 @@ Plane wall {
 }
 
 ImplicitSurface surface {
-    formula x * x + y * y + z * z - 100
+    formula x * x + y * y + z * z  - 100
     triangulate false
+    triangulationQuality 100
     gofast true
 }
 

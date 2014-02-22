@@ -1,14 +1,14 @@
 
 GlobalSettings {
-	frameWidth          640
-	frameHeight         480
+	frameWidth          480
+	frameHeight         360
 	ambientLight        (0.075, 0.075, 0.075)
-	maxTraceDepth 8
+	maxTraceDepth 1
 }
 
 Camera camera {
-	pos          (-30, 22, -40)
-	yaw           -34.4
+	pos          (40, 22, 0)
+	yaw           -68.8
 	pitch        -22.9
 	roll          0.0
 	fov           90
@@ -21,7 +21,7 @@ Camera camera {
 RectLight l2 {
 	xSubd 4
 	ySubd 4
-	translate	(50, 50, -20)
+	translate	(-50, 50, 20)
 	scale   (8, 8, 8)
 	color	(1, 1, 1)
 	power   62.5
@@ -29,8 +29,8 @@ RectLight l2 {
 }
 
 RectLight l_small {
-	translate  (0, 28, 50)
-	rotate     (0, -62, 0)
+	translate  (0, 10, 30)
+	rotate     (0, -90, 0)
 	scale      (10, 10, 10)
 	color	   (1, 1, 1)
 	power      40
@@ -46,7 +46,10 @@ Plane wall {
 }
 
 ImplicitSurface surface {
-
+    formula x * x + y * y + z * z - 100
+    triangulate true
+    triangulationQuality 10
+    gofast false
 }
 
 Mesh teapot {
@@ -126,6 +129,9 @@ Node surfaceNode {
     geometry    surface
     shader      red
 }
+
+
+
 /*
 Node wall_PositiveX {
 	geometry	wall
